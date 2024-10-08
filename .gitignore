@@ -1,0 +1,9 @@
+/.direnv/
+/build/
+/.vscode/
+/out/
+*.bak*
+indent.log
+/result
+/*.pdf
+/src/cr-seminaire/*.pdf
