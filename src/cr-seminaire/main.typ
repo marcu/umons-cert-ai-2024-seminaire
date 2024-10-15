@@ -13,3 +13,4 @@
 #set par(justify: true)
 
 #include "./s1.typ"
+#include "./s2.typ"
