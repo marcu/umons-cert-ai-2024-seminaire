@@ -37,7 +37,7 @@ jobs:
 
             - name: Build document
               run: |
-                  nix build . --quiet
+                  nix build .#cr-seminaire --quiet
                   cp result/cr-seminaire.pdf cr-seminaire.pdf
 
             - name: Upload build assets
