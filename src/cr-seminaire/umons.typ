@@ -160,15 +160,29 @@
 
   let title-page() = {
     set page(
-      header: grid(
-        columns: (1fr, 1fr),
-        v(1em), v(1em),
-        align(top + left)[
-          #image("UMONS_FS.svg", height: 20mm)
-        ],
-        align(top + right)[
-          #image("UMONS-logo.svg", height: 25mm)
-        ],
+      header: align(
+        top,
+        [
+          #v(1em)
+          #set align(top)
+          #grid(
+            columns: (1fr, 1fr, 1fr),
+            {
+              align(left)[
+                #image("UMONS_FS.svg", height: 20mm),
+              ]
+            },
+            {
+              align(center)[
+                #image("fpms.svg", height: 20mm),
+              ]
+            },
+            {
+              align(right)[
+                #image("UMONS-logo.svg", height: 25mm)
+              ]
+            },
+          )],
       ),
       footer: align(
         center,
