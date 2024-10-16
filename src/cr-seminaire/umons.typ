@@ -167,19 +167,20 @@
           #set align(top)
           #grid(
             columns: (1fr, 1fr, 1fr),
+            rows: 15mm,
             {
               align(left)[
-                #image("UMONS_FS.svg", height: 20mm),
+                #image("UMONS_FS.svg"),
               ]
             },
             {
               align(center)[
-                #image("fpms.svg", height: 20mm),
+                #image("fpms.svg"),
               ]
             },
             {
               align(right)[
-                #image("UMONS-logo.svg", height: 25mm)
+                #image("UMONS-logo.svg")
               ]
             },
           )],
