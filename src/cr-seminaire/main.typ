@@ -15,3 +15,4 @@
 #include "./s1.typ"
 #include "./s2.typ"
 #include "./s3.typ"
+#include "./s4.typ"
