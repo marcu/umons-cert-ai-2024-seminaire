@@ -12,32 +12,23 @@
   // The article's title.
   title: "Paper title",
   subtitle: none,
-
   department: "",
-
   // An array of authors. For each author you can specify a name,
   // department, organization, location, and email. Everything but
   // but the name is optional.
   authors: (),
-
   academic-year: "",
-
   professor: "",
-
   // Your article's abstract. Can be omitted if you don't have one.
   abstract: none,
-
   // The article's paper size. Also affects the margins.
   paper-size: "a4",
-
   // The path to a bibliography file if you want to cite some external
   // works.
   bibliography-file: none,
-
   // The document's content.
   body,
-
-  font: "Garamond Libre"
+  font: "Garamond Libre",
 ) = {
   // Set document metadata.
   set document(title: title, author: authors)
@@ -53,40 +44,41 @@
     // authors, except on the first page. The page number is on
     // the left for even pages and on the right for odd pages.
     header-ascent: 14pt,
-    header: locate(loc => {
-      let i = counter(page).at(loc).first()
-      if i == 1 { return }
-      set text(size: script-size)
-      grid(
-        columns: (6em, 1fr, 6em),
-        if calc.even(i) { align(left)[#i] },
-        align(center, upper(
-          if calc.odd(i) { title } else { authors }
-        )),
-        if calc.odd(i) { align(right)[#i] }
-      )
-    }),
-
-    // On the first page, the footer should contain the page number.
-    footer-descent: 12pt,
-    footer: locate(loc => {
-      let i = counter(page).at(loc).first()
-      if i == 1 {
-        align(
-            center,
-            text[
-                Faculty of Sciences #sym.diamond.filled.small University of Mons #sym.diamond.filled.small
-                Place du Parc 20 #sym.diamond.filled.small
-                B-7000 Mons]
+    header: {
+      context {
+        let i = counter(page).at(here()).first()
+        if i == 1 { return }
+        set text(size: script-size)
+        grid(
+          columns: (6em, 1fr, 6em),
+          if calc.even(i) { align(left)[#i] },
+          align(center, upper(if calc.odd(i) { title } else { authors })),
+          if calc.odd(i) { align(right)[#i] },
         )
       }
-    }),
+    },
+    // On the first page, the footer should contain the page number.
+    footer-descent: 12pt,
+    footer: {
+      context {
+        let i = counter(page).at(here()).first()
+        if i == 1 {
+          align(
+            center,
+            text[
+              Faculty of Sciences #sym.diamond.filled.small University of Mons #sym.diamond.filled.small
+              Place du Parc 20 #sym.diamond.filled.small
+              B-7000 Mons],
+          )
+        }
+      }
+    },
   )
 
   // Configure headings.
   show heading.where(level: 1): it => [
     #set text(
-      font: ("Latin Modern Sans"),
+      font: "Latin Modern Sans",
       size: large-size,
     )
     #pagebreak(weak: true)
@@ -97,7 +89,7 @@
 
   show heading.where(level: 2): it => [
     #set text(
-      font: ("Latin Modern Sans"),
+      font: "Latin Modern Sans",
       size: normal-size,
     )
     #it.body
@@ -260,12 +252,14 @@
 
   pagebreak()
 
-  set page(margin: (
-    top: 75pt,
-    left: 50pt,
-    right: 50pt,
-    bottom: 25pt,
-  ))
+  set page(
+    margin: (
+      top: 75pt,
+      left: 50pt,
+      right: 50pt,
+      bottom: 25pt,
+    ),
+  )
 
   body
 

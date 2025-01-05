@@ -16,3 +16,5 @@
 #include "./s2.typ"
 #include "./s3.typ"
 #include "./s4.typ"
+#include "./s5.typ"
+#include "./s6.typ"

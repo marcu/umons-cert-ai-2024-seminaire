@@ -1,8 +1,10 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
     systems.url = "github:nix-systems/default";
+    typst-dev.url = "github:typst/typst";
     typst-packages = {
       flake = false;
       url = "github:typst/packages";
@@ -16,6 +18,7 @@
       systems = import inputs.systems;
 
       imports = [
+        ./nix/imports/pkgs.nix
         inputs.pkgs-by-name-for-flake-parts.flakeModule
       ];
 
@@ -27,7 +30,8 @@
           ...
         }:
         let
-          typst = pkgs.typst;
+          # Change here to typst-dev if needed
+          typst = pkgs.nixpkgs-unstable.typst;
 
           fontsConf = pkgs.symlinkJoin {
             name = "typst-fonts";
@@ -38,23 +42,6 @@
             ];
           };
 
-          typst-wrapper-factory =
-            typstDrv: typst-packages: typstFontPaths:
-            pkgs.writeShellApplication {
-              name = "typst-wrapper";
-
-              runtimeInputs = [
-                typstDrv
-                typst-packages
-              ];
-
-              text = ''
-                TYPST_FONT_PATHS=${typstFontPaths} XDG_CACHE_HOME=${typst-packages} ${lib.getExe typstDrv} "$@"
-              '';
-            };
-
-          typst-wrapper = typst-wrapper-factory typst config.packages.typst-packages fontsConf;
-
           mkBuildDocumentDrv =
             documentName:
             pkgs.stdenvNoCC.mkDerivation {
@@ -62,18 +49,24 @@
 
               src = pkgs.lib.cleanSource ./.;
 
-              buildInputs = [ typst-wrapper ];
+              nativeBuildInputs = [
+                typst
+              ];
 
               buildPhase = ''
                 runHook preBuild
 
-                ${lib.getExe typst-wrapper} \
+                ${lib.getExe typst} fonts --variants --ignore-system-fonts --font-path ${fontsConf}
+
+                ${lib.getExe typst} \
                   compile \
                   --root ./. \
                   --input rev="${inputs.self.rev or ""}" \
                   --input shortRev="${inputs.self.shortRev or ""}" \
                   --input builddate="$(date -u -d @${toString (inputs.self.lastModified or "")})" \
+                  --package-path ${inputs.typst-packages}/packages \
                   --font-path ${fontsConf} \
+                  --ignore-system-fonts \
                   ./src/${documentName}/main.typ \
                   ${documentName}.pdf
 
@@ -94,16 +87,42 @@
             pkgs.writeShellApplication {
               name = "build-${documentName}";
 
-              runtimeInputs = [ typst-wrapper ];
+              runtimeInputs = [ typst ];
 
               text = ''
-                ${lib.getExe typst-wrapper} \
+                ${lib.getExe typst} fonts --ignore-system-fonts --font-path ${fontsConf}
+
+                ${lib.getExe typst} \
                   compile \
                   --root ./. \
                   --input rev="${inputs.self.rev or ""}" \
                   --input shortRev="${inputs.self.shortRev or ""}" \
                   --input builddate="$(date -u -d @${toString (inputs.self.lastModified or "")})" \
+                  --package-path ${inputs.typst-packages}/packages \
                   --font-path ${fontsConf} \
+                  --ignore-system-fonts \
+                  ./src/${documentName}/main.typ \
+                  ${documentName}.pdf
+              '';
+            };
+
+          mkWatchDocumentScript =
+            documentName:
+            pkgs.writeShellApplication {
+              name = "watch-${documentName}";
+
+              runtimeInputs = [ typst ];
+
+              text = ''
+                ${lib.getExe typst} \
+                  watch \
+                  --root ./. \
+                  --input rev="${inputs.self.rev or ""}" \
+                  --input shortRev="${inputs.self.shortRev or ""}" \
+                  --input builddate="$(date -u -d @${toString (inputs.self.lastModified or "")})" \
+                  --package-path ${inputs.typst-packages}/packages \
+                  --font-path ${fontsConf} \
+                  --ignore-system-fonts \
                   ./src/${documentName}/main.typ \
                   ${documentName}.pdf
               '';
@@ -113,11 +132,16 @@
             lib.filterAttrs (k: v: (v == "directory")) (builtins.readDir ./src)
           )) (d: mkBuildDocumentDrv d);
 
-          scriptDrvs = lib.foldl' (
+          scriptDrvs =
+            {
+              "sign-pdf" = config.packages.sign-pdf;
+            }
+            // lib.foldl' (
               a: i:
               a
               // {
                 "build-${i}" = mkBuildDocumentScript i;
+                "watch-${i}" = mkWatchDocumentScript i;
               }
             ) { } (lib.attrNames documentDrvs);
         in
@@ -128,7 +152,6 @@
           devShells.default = pkgs.mkShellNoCC {
             packages = (lib.attrValues scriptDrvs) ++ [
               typst
-              typst-wrapper
               pkgs.gnuplot
               pkgs.pympress
             ];
@@ -136,7 +159,6 @@
             shellHook = ''
               echo "Typst version: ${typst.version}"
               echo "Typst bin: ${lib.getExe typst}"
-              echo "Typst wrapper bin: ${lib.getExe typst-wrapper}"
               echo "Typst packages directory: ${config.packages.typst-packages}"
               echo "Typst fonts directory: ${fontsConf}"
             '';
