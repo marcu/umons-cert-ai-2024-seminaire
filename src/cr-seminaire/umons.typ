@@ -66,7 +66,7 @@
           align(
             center,
             text[
-              Faculty of Sciences #sym.diamond.filled.small University of Mons #sym.diamond.filled.small
+              Faculty of Engineering #sym.diamond.filled.small University of Mons #sym.diamond.filled.small
               Place du Parc 20 #sym.diamond.filled.small
               B-7000 Mons],
           )
@@ -180,7 +180,7 @@
       footer: align(
         center,
         text[
-          Faculty of Sciences #sym.diamond.filled.small University of Mons #sym.diamond.filled.small
+          Faculty of Engineering #sym.diamond.filled.small University of Mons #sym.diamond.filled.small
           Place du Parc 20 #sym.diamond.filled.small
           B-7000 Mons
         ],
