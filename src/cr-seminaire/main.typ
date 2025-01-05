@@ -6,7 +6,7 @@
   department: "informatique",
   academic-year: "2024",
   authors: (
-    "Pol Dellaiera"
+    "Marc Ducobu"
   )
 )
 
