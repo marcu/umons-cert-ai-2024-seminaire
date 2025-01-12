@@ -17,3 +17,4 @@
 #include "./s4.typ"
 #include "./s5.typ"
 #include "./s6.typ"
+#include "./t_conclusion.typ"

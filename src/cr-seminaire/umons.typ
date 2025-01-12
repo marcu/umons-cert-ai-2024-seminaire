@@ -12,7 +12,7 @@
   // The article's title.
   title: "Paper title",
   subtitle: none,
-  department: "",
+  department: "Certificat en IA",
   // An array of authors. For each author you can specify a name,
   // department, organization, location, and email. Everything but
   // but the name is optional.
